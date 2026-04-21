@@ -23,6 +23,8 @@ class ImageProcessor:
             raise ValueError("The given colour is not supported!")
 
         # ToDo: Save the colour type and load the image using CV2.
+        self.image = cv2.imread(image_path)
+
         self._colour_type: str = colour_type
         self._image: np.ndarray = np.zeros(0)
 
@@ -46,7 +48,7 @@ class ImageProcessor:
         total_image_path: str = os.path.join(self._image_directory, image_title)
 
         # ToDo: Save the image.
-        pass
+        cv2.imwrite(total_image_path, self.image)
 
     def convert_colour(self):
         """
