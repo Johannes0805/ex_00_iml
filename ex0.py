@@ -34,7 +34,14 @@ class ImageProcessor:
         """
 
         # ToDo: Show the image depending on the colour type.
-        pass
+        if self._colour_type == "BGR":
+            cv2.imshow("BGR Image", self.image)
+        elif self._colour_type == "RGB":
+            cv2.cvtColor(self.image, cv2.COLOR_BGR2RGB)
+            cv2.imshow("RGB Image", self.image)
+        else:
+            cv2.cvtColor(self.image, cv2.COLOR_BGR2GRAY)
+            cv2.imshow("GRAY Image", self.image)
 
     def save_image(self, image_title: str):
         """
@@ -59,11 +66,19 @@ class ImageProcessor:
         if self._colour_type not in ["RGB", "BGR"]:
             raise ValueError("The function only works for colour images!")
 
-        # ToDo: Perform the colour conversion.
-        pass
 
+        # ToDo: Perform the colour conversion.
         # ToDo: Update the colour type.
-        pass
+        if self._colour_type == "BGR":
+            self.image = self.image[:,:,[2,1,0]]
+            self._colour_type = "RGB"
+            return
+        elif self._colour_type == "RGB":
+            self.image = self.image[:,:,[0,1,2]]
+            self._colour_type = "BGR"
+            return
+
+
 
     def clip_image(self, clip_min: int, clip_max: int):
         """
@@ -76,7 +91,12 @@ class ImageProcessor:
         clip_max (int): Maximum image colour intensity.
         """
         # ToDo: Clip the image values to the given values.
-        pass
+
+        self.image[self.image < clip_min] = clip_min
+        self.image[self.image>clip_max] = clip_max
+
+
+        #self.image[:,:,0] = clip_max if self.image[:,:, 0] > clip_max clip_min if
 
     def convert_to_grayscale(self, method: str = "lightness"):
         """
