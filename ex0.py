@@ -103,33 +103,38 @@ class ImageProcessor:
         self.image[self.image < clip_min] = clip_min
         self.image[self.image > clip_max] = clip_max
 
-
-        #self.image[:,:,0] = clip_max if self.image[:,:, 0] > clip_max clip_min if
-
     def convert_to_grayscale(self, method: str = "lightness"):
         """
         Convert a colour image to a grayscale image.
         Write the different options from scratch.
-
         Args:
         method (str): Method for the colour conversion, either lightness, average or luminosity.
         """
+
+
+
         if method not in ["lightness", "average", "luminosity"]:
             raise ValueError("The given method is not supported!")
         if self._colour_type not in ["BGR", "RGB"]:
             raise ValueError("The function only works for colour images!")
 
+        if self._colour_type == "RGB":
+            r, g, b = cv2.split(self.image)
+        else:
+            b, g, r = cv2.split(self.image)
+
         if method == "lightness":
-            pass
-
+            grayscale = (cv2.max(cv2.max(r, g), b) + cv2.min(cv2.min(r, g), b)) / 2
+            self.image = cv2.merge([grayscale, grayscale, grayscale])
         if method == "average":
-            pass
-
+            grayscale = (r + g + b) / 3
+            self.image = cv2.merge([grayscale,grayscale,grayscale])
         if method == "luminosity":
-            pass
+            grayscale = (0.21 * r + 0.72 * g + 0.07 * b)
+            self.image = cv2.merge([grayscale,grayscale,grayscale])
 
-        # ToDo: Update the colour type.
-        pass
+        self._colour_type = "Gray"
+
 
     def rotate_image(self, degrees: int = 0):
         """
@@ -142,8 +147,17 @@ class ImageProcessor:
         if degrees % 90 != 0:
             raise ValueError("The provided rotation angle must be a multiple of 90!")
 
-        # ToDo: Rotate the image depending on the given rotation value.
-        pass
+        # Calculating
+        k = (degrees//90) % 4
+
+        if k == 0:
+            return
+        elif k == 1:
+            self.image = self.image.transpose((1,0,2))[:, ::-1, :]
+        elif k == 2:
+            self.image = self.image[::-1, ::-1, :]
+        elif k == 3:
+            self.image = self.image.transpose((1, 0, 2))[::-1, :, :]
 
     def flip_image(self, flip_value: int):
         """
@@ -153,6 +167,7 @@ class ImageProcessor:
         Args:
         flip_value (int): Value to determine how the image should be flipped.
         """
+
         if flip_value not in [0, 1, 2]:
             raise ValueError("The provided flip value must be either 0, 1 or 2!")
 
