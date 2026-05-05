@@ -69,11 +69,19 @@ class ImageProcessor:
 
         # ToDo: Perform the colour conversion.
         # ToDo: Update the colour type.
+
+
         if self._colour_type == "BGR":
+            # Alternative solution
+            # b, g, r = cv2.split(self.image)
+            # self.image = cv2.merge((r,g,b))
             self.image = self.image[:,:,[2,1,0]]
             self._colour_type = "RGB"
             return
         elif self._colour_type == "RGB":
+            # Alternative solution
+            # r, g, b = cv2.split(self.image)
+            # self.image = cv2.merge((b,g,r))
             self.image = self.image[:,:,[0,1,2]]
             self._colour_type = "BGR"
             return
@@ -93,7 +101,7 @@ class ImageProcessor:
         # ToDo: Clip the image values to the given values.
 
         self.image[self.image < clip_min] = clip_min
-        self.image[self.image>clip_max] = clip_max
+        self.image[self.image > clip_max] = clip_max
 
 
         #self.image[:,:,0] = clip_max if self.image[:,:, 0] > clip_max clip_min if
