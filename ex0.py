@@ -170,9 +170,12 @@ class ImageProcessor:
 
         if flip_value not in [0, 1, 2]:
             raise ValueError("The provided flip value must be either 0, 1 or 2!")
-
-        # ToDo: Flip the image using indexing.
-        pass
+        if flip_value == 0:
+            self.image = self.image[::-1, :, :]
+        elif flip_value == 1:
+            self.image = self.image[:, ::-1, :]
+        elif flip_value == 2:
+            self.image = self.image[::-1, ::-1, :]
 
     def crop_center(self, new_height: int, new_width: int):
         """
