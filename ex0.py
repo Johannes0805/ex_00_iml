@@ -170,9 +170,12 @@ class ImageProcessor:
 
         if flip_value not in [0, 1, 2]:
             raise ValueError("The provided flip value must be either 0, 1 or 2!")
-
-        # ToDo: Flip the image using indexing.
-        pass
+        if flip_value == 0:
+            self.image = self.image[::-1, :, :]
+        elif flip_value == 1:
+            self.image = self.image[:, ::-1, :]
+        elif flip_value == 2:
+            self.image = self.image[::-1, ::-1, :]
 
     def crop_center(self, new_height: int, new_width: int):
         """
@@ -183,11 +186,21 @@ class ImageProcessor:
         new_height (int): Height of the cropped image.
         new_width (int): Width of the cropped image.
         """
-        # ToDo: Check that the given parameters are valid!
-        pass
 
-        # ToDo: Crop the image around the center.
-        pass
+        w, h, c = self.image.shape
+        if new_height < 0 or new_width < 0 or new_height > h or new_width > w :
+            raise ValueError("The provided new width and height are not valid")
+
+        center_h = h // 2
+        center_w = w // 2
+
+        start_y = center_h + (new_height // 2)
+        start_x = center_w + (new_width // 2)
+
+        end_x = center_h - (new_height // 2)
+        end_y = center_w - (new_width // 2)
+
+        self.image = self.image[start_y:end_y, start_x:end_x]
 
     def resize_image(self, new_height: int, new_width: int):
         """
@@ -197,8 +210,11 @@ class ImageProcessor:
         new_height (int): Height of the resized image.
         new_width (int): Width of the resized image.
         """
-        # ToDo: Resize the image. Research the available options in CV2.
 
+        if new_width < 0 or new_height < 0 :
+            raise ValueError("The Input is smaller than 0")
+
+        self.image = cv2.resize(self.image,(new_width, new_height))
 
 if __name__ == '__main__':
     processor = ImageProcessor(image_path=IMAGE_PATH, colour_type="BGR")
