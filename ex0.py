@@ -28,6 +28,15 @@ class ImageProcessor:
         self._colour_type: str = colour_type
         self._image: np.ndarray = np.zeros(0)
 
+    def get_image_data(self) -> tuple[np.ndarray, str]:
+        """
+        Return the image data (image and colour scheme).
+
+        Returns:
+            tuple(np.ndarray, str): Loaded image and current colour scheme.
+        """
+        return self._image, self._colour_type
+
     def show_image(self):
         """
         Show the loaded image using either matplotlib or CV2.
