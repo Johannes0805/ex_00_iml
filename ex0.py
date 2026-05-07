@@ -91,7 +91,7 @@ class ImageProcessor:
             # Alternative solution
             # r, g, b = cv2.split(self.image)
             # self.image = cv2.merge((b,g,r))
-            self._image = self._image[:, :,[0, 1, 2]]
+            self._image = self._image[:, :,[2, 1, 0]]
             self._colour_type = "BGR"
             return
 
