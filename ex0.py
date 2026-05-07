@@ -23,10 +23,10 @@ class ImageProcessor:
             raise ValueError("The given colour is not supported!")
 
         # ToDo: Save the colour type and load the image using CV2.
-        self.image = cv2.imread(image_path)
+        self._image = cv2.imread(image_path)
 
         self._colour_type: str = colour_type
-        self._image: np.ndarray = np.zeros(0)
+        self._image: np.ndarray = cv2.imread(image_path)
 
     def get_image_data(self) -> tuple[np.ndarray, str]:
         """
@@ -44,13 +44,13 @@ class ImageProcessor:
 
         # ToDo: Show the image depending on the colour type.
         if self._colour_type == "BGR":
-            cv2.imshow("BGR Image", self.image)
+            cv2.imshow("BGR Image", self._image)
         elif self._colour_type == "RGB":
-            cv2.cvtColor(self.image, cv2.COLOR_BGR2RGB)
-            cv2.imshow("RGB Image", self.image)
+            cv2.cvtColor(self._image, cv2.COLOR_BGR2RGB)
+            cv2.imshow("RGB Image", self._image)
         else:
-            cv2.cvtColor(self.image, cv2.COLOR_BGR2GRAY)
-            cv2.imshow("GRAY Image", self.image)
+            cv2.cvtColor(self._image, cv2.COLOR_BGR2GRAY)
+            cv2.imshow("GRAY Image", self._image)
 
     def save_image(self, image_title: str):
         """
@@ -64,7 +64,7 @@ class ImageProcessor:
         total_image_path: str = os.path.join(self._image_directory, image_title)
 
         # ToDo: Save the image.
-        cv2.imwrite(total_image_path, self.image)
+        cv2.imwrite(total_image_path, self._image)
 
     def convert_colour(self):
         """
@@ -84,14 +84,14 @@ class ImageProcessor:
             # Alternative solution
             # b, g, r = cv2.split(self.image)
             # self.image = cv2.merge((r,g,b))
-            self.image = self.image[:,:,[2,1,0]]
+            self._image = self._image[:, :,[2, 1, 0]]
             self._colour_type = "RGB"
             return
         elif self._colour_type == "RGB":
             # Alternative solution
             # r, g, b = cv2.split(self.image)
             # self.image = cv2.merge((b,g,r))
-            self.image = self.image[:,:,[0,1,2]]
+            self._image = self._image[:, :,[0, 1, 2]]
             self._colour_type = "BGR"
             return
 
@@ -109,8 +109,8 @@ class ImageProcessor:
         """
         # ToDo: Clip the image values to the given values.
 
-        self.image[self.image < clip_min] = clip_min
-        self.image[self.image > clip_max] = clip_max
+        self._image[self._image < clip_min] = clip_min
+        self._image[self._image > clip_max] = clip_max
 
     def convert_to_grayscale(self, method: str = "lightness"):
         """
@@ -128,19 +128,19 @@ class ImageProcessor:
             raise ValueError("The function only works for colour images!")
 
         if self._colour_type == "RGB":
-            r, g, b = cv2.split(self.image)
+            r, g, b = cv2.split(self._image)
         else:
-            b, g, r = cv2.split(self.image)
+            b, g, r = cv2.split(self._image)
 
         if method == "lightness":
             grayscale = (cv2.max(cv2.max(r, g), b) + cv2.min(cv2.min(r, g), b)) / 2
-            self.image = cv2.merge([grayscale, grayscale, grayscale])
+            self._image = cv2.merge([grayscale, grayscale, grayscale])
         if method == "average":
             grayscale = (r + g + b) / 3
-            self.image = cv2.merge([grayscale,grayscale,grayscale])
+            self._image = cv2.merge([grayscale, grayscale, grayscale])
         if method == "luminosity":
             grayscale = (0.21 * r + 0.72 * g + 0.07 * b)
-            self.image = cv2.merge([grayscale,grayscale,grayscale])
+            self._image = cv2.merge([grayscale, grayscale, grayscale])
 
         self._colour_type = "Gray"
 
@@ -162,11 +162,11 @@ class ImageProcessor:
         if k == 0:
             return
         elif k == 1:
-            self.image = self.image.transpose((1,0,2))[:, ::-1, :]
+            self._image = self._image.transpose((1, 0, 2))[:, ::-1, :]
         elif k == 2:
-            self.image = self.image[::-1, ::-1, :]
+            self._image = self._image[::-1, ::-1, :]
         elif k == 3:
-            self.image = self.image.transpose((1, 0, 2))[::-1, :, :]
+            self._image = self._image.transpose((1, 0, 2))[::-1, :, :]
 
     def flip_image(self, flip_value: int):
         """
@@ -180,11 +180,11 @@ class ImageProcessor:
         if flip_value not in [0, 1, 2]:
             raise ValueError("The provided flip value must be either 0, 1 or 2!")
         if flip_value == 0:
-            self.image = self.image[::-1, :, :]
+            self._image = self._image[::-1, :, :]
         elif flip_value == 1:
-            self.image = self.image[:, ::-1, :]
+            self._image = self._image[:, ::-1, :]
         elif flip_value == 2:
-            self.image = self.image[::-1, ::-1, :]
+            self._image = self._image[::-1, ::-1, :]
 
     def crop_center(self, new_height: int, new_width: int):
         """
@@ -196,7 +196,7 @@ class ImageProcessor:
         new_width (int): Width of the cropped image.
         """
 
-        w, h, c = self.image.shape
+        w, h, c = self._image.shape
         if new_height < 0 or new_width < 0 or new_height > h or new_width > w :
             raise ValueError("The provided new width and height are not valid")
 
@@ -209,7 +209,7 @@ class ImageProcessor:
         end_x = center_h - (new_height // 2)
         end_y = center_w - (new_width // 2)
 
-        self.image = self.image[start_y:end_y, start_x:end_x]
+        self._image = self._image[start_y:end_y, start_x:end_x]
 
     def resize_image(self, new_height: int, new_width: int):
         """
@@ -223,7 +223,7 @@ class ImageProcessor:
         if new_width < 0 or new_height < 0 :
             raise ValueError("The Input is smaller than 0")
 
-        self.image = cv2.resize(self.image,(new_width, new_height))
+        self._image = cv2.resize(self._image, (new_width, new_height))
 
 if __name__ == '__main__':
     processor = ImageProcessor(image_path=IMAGE_PATH, colour_type="BGR")
