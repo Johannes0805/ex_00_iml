@@ -218,3 +218,4 @@ class ImageProcessor:
 
 if __name__ == '__main__':
     processor = ImageProcessor(image_path=IMAGE_PATH, colour_type="BGR")
+
