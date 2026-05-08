@@ -23,10 +23,9 @@ class ImageProcessor:
             raise ValueError("The given colour is not supported!")
 
         # ToDo: Save the colour type and load the image using CV2.
-        self._image = cv2.imread(image_path)
 
-        self._colour_type: str = colour_type
-        self._image: np.ndarray = cv2.imread(image_path)
+        self._colour_type = colour_type
+        self._image = cv2.imread(image_path)
 
     def get_image_data(self) -> tuple[np.ndarray, str]:
         """
@@ -44,13 +43,16 @@ class ImageProcessor:
 
         # ToDo: Show the image depending on the colour type.
         if self._colour_type == "BGR":
-            cv2.imshow("BGR Image", self._image)
+            cv2.imshow("BGR.png", self._image)
         elif self._colour_type == "RGB":
-            cv2.cvtColor(self._image, cv2.COLOR_BGR2RGB)
-            cv2.imshow("RGB Image", self._image)
+            converted = cv2.cvtColor(self._image, cv2.COLOR_BGR2RGB)
+            cv2.imshow("RGB.png", converted)
         else:
-            cv2.cvtColor(self._image, cv2.COLOR_BGR2GRAY)
-            cv2.imshow("GRAY Image", self._image)
+            converted = cv2.cvtColor(self._image, cv2.COLOR_BGR2GRAY)
+            cv2.imshow("GRAY.png", converted)
+
+        cv2.waitKey(0)
+        cv2.destroyAllWindows()
 
     def save_image(self, image_title: str):
         """
@@ -112,6 +114,7 @@ class ImageProcessor:
         self._image[self._image < clip_min] = clip_min
         self._image[self._image > clip_max] = clip_max
 
+
     def convert_to_grayscale(self, method: str = "lightness"):
         """
         Convert a colour image to a grayscale image.
@@ -133,13 +136,13 @@ class ImageProcessor:
             b, g, r = cv2.split(self._image)
 
         if method == "lightness":
-            grayscale = (cv2.max(cv2.max(r, g), b) + cv2.min(cv2.min(r, g), b)) / 2
+            grayscale = (cv2.max(cv2.max(r, g), b) + cv2.min(cv2.min(r, g), b)) // 2
             self._image = cv2.merge([grayscale, grayscale, grayscale])
         if method == "average":
-            grayscale = (r + g + b) / 3
+            grayscale = (r + g + b) // 3
             self._image = cv2.merge([grayscale, grayscale, grayscale])
         if method == "luminosity":
-            grayscale = (0.21 * r + 0.72 * g + 0.07 * b)
+            grayscale = (0.21 * r + 0.72 * g + 0.07 * b).astype(np.uint8)
             self._image = cv2.merge([grayscale, grayscale, grayscale])
 
         self._colour_type = "Gray"
@@ -196,18 +199,17 @@ class ImageProcessor:
         new_width (int): Width of the cropped image.
         """
 
-        w, h, c = self._image.shape
+        h, w, c = self._image.shape
         if new_height < 0 or new_width < 0 or new_height > h or new_width > w :
             raise ValueError("The provided new width and height are not valid")
 
-        center_h = h // 2
-        center_w = w // 2
+        center_y = h // 2
+        center_x = w // 2
 
-        start_y = center_h + (new_height // 2)
-        start_x = center_w + (new_width // 2)
-
-        end_x = center_h - (new_height // 2)
-        end_y = center_w - (new_width // 2)
+        start_y = center_y - (new_height // 2)
+        end_y = center_y + (new_height // 2)
+        start_x = center_x - (new_width // 2)
+        end_x = center_x + (new_width // 2)
 
         self._image = self._image[start_y:end_y, start_x:end_x]
 
@@ -227,4 +229,15 @@ class ImageProcessor:
 
 if __name__ == '__main__':
     processor = ImageProcessor(image_path=IMAGE_PATH, colour_type="BGR")
+    #processor.save_image("test.png")
+    #processor.convert_colour()
+    #processor.clip_image(50,100)
+    #processor.convert_to_grayscale("lightness")
+    #processor.convert_to_grayscale("average")
+    #processor.convert_to_grayscale("luminosity")
+    #processor.rotate_image(270)
+    #processor.flip_image(2)
+    #processor.crop_center(170,85)
+    #processor.resize_image(1000,1000)
+    processor.show_image()
 
